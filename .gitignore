@@ -66,3 +66,8 @@ libstandaloneengine.a
 tests/string
 tests/config
 
+
+arm-build/
+mingw-build/
+x86-build/
+
