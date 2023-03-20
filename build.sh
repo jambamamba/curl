@@ -1,7 +1,7 @@
 #!/bin/bash -xe
 set -xe
 
-source toolchains/helper-functions.sh
+source share/scripts/helper-functions.sh
 
 function skip(){
     local target="x86"
@@ -46,7 +46,7 @@ function build(){
     pushd "${builddir}"
 
     if [ "$target" == "mingw" ]; then
-        source "../toolchains/x86_64-w64-mingw32.sh"
+        source "../share/toolchains/x86_64-w64-mingw32.sh"
         cmake \
             -DCMAKE_INSTALL_BINDIR=$(pwd) \
             -DCMAKE_INSTALL_LIBDIR=$(pwd) \
