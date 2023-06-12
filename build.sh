@@ -72,7 +72,7 @@ function build(){
             -DCMAKE_TOOLCHAIN_FILE="${srcdir}/curl-options.cmake" \
             -G "Ninja" .. 
     elif [ "$target" == "arm" ]; then
-        source "${SDK_DIR}/environment-setup-aarch64-fslc-linux"
+        source "${SDK_DIR}/environment-setup-cortexa72-oe-linux"
         cmake \
             -DBUILD_SHARED_LIBS=ON \
             -DCMAKE_MODULE_PATH="${cmake_modules_path}" \
@@ -95,7 +95,7 @@ function installDependencies() {
     local target="x86"
     local builddir=""
     parseArgs $@
-    local artifacts_url="/home/$USER/Downloads"
+    local artifacts_url="/home/$USER/downloads"
     local libs=(zlib openssl)
     for library in "${libs[@]}"; do
         local pin="${library}_pin"
