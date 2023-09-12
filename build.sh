@@ -27,7 +27,7 @@ function skip(){
     return 0
 }
 
-function build(){
+function build() {
     local clean=""
     local target="x86"
     local builddir=""
@@ -70,7 +70,7 @@ function build(){
             -DCMAKE_INSTALL_PREFIX=../install-win \
             -DMINGW=1 \
             -DCMAKE_TOOLCHAIN_FILE="${srcdir}/curl-options.cmake" \
-            -G "Ninja" .. 
+            -G "Ninja" ..
     elif [ "$target" == "arm" ]; then
         source "${SDK_DIR}/environment-setup-cortexa72-oe-linux"
         cmake \
@@ -83,6 +83,8 @@ function build(){
 		export STRIP="$(which strip)"
         cmake \
             -DBUILD_SHARED_LIBS=ON \
+            -DCMAKE_MODULE_PATH="${cmake_modules_path}" \
+            -DCMAKE_PREFIX_PATH="${cmake_modules_path}" \
             -DCMAKE_TOOLCHAIN_FILE="${srcdir}/curl-options.cmake" \
             -G "Ninja" ..
     fi
@@ -96,7 +98,7 @@ function installDependencies() {
     local builddir=""
     parseArgs $@
     local artifacts_url="/home/$USER/downloads"
-    local libs=(zlib openssl)
+    local libs=(zlib openssl ssh2)
     for library in "${libs[@]}"; do
         local pin="${library}_pin"
         # echo "${!pin}" #gets the value of variable where the variable name is "${library}_pin"
@@ -105,7 +107,7 @@ function installDependencies() {
     done
 }
 
-function main(){
+function main() {
     parseArgs $@
 
     local builddir="$(pwd)/${target}-build"
@@ -117,7 +119,17 @@ function main(){
     skip $@ library="curl"
     installDependencies $@ builddir="${builddir}"
     build $@ builddir="${builddir}"
-    package $@ library="curl" builddir="${builddir}"
+
+    # package $@ library="curl" builddir="${builddir}"
+    local library="curl"
+    local builddir="/tmp/${library}/${target}-build"
+    copyBuildFilesToInstalls $@ builddir="${builddir}"
+        local installsdir="${builddir}/installs"
+        mv ${installsdir}/include/include ${installsdir}/real_include
+        rm -fr ${installsdir}/include
+        mv ${installsdir}/real_include ${installsdir}/include 
+    compressInstalls $@ builddir="${builddir}" library="${library}"
+
 }
 
 time main $@
