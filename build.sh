@@ -95,29 +95,29 @@ function build() {
 
 function installDependencies() {
     local target="x86"
-    local builddir=""
     parseArgs $@
+    local depsdir=".deps/${target}"
     local artifacts_url="/home/$USER/downloads"
     local libs=(zlib openssl ssh2)
     for library in "${libs[@]}"; do
         local pin="${library}_pin"
         # echo "${!pin}" #gets the value of variable where the variable name is "${library}_pin"
         local artifacts_file="${library}-${!pin}-${target}.tar.xz"
-        installLib $@ library="${library}" artifacts_file="${artifacts_file}" artifacts_url="${artifacts_url}" 
+        installLib $@ library="${library}" artifacts_file="${artifacts_file}" artifacts_url="${artifacts_url}" depsdir=${depsdir}
     done
 }
 
 function main() {
     parseArgs $@
 
-    local builddir="$(pwd)/${target}-build"
+    local builddir="${target}-build"
     if [ "$clean" == "true" ]; then
         rm -fr "${builddir}"
     fi
     mkdir -p "${builddir}"
 
     skip $@ library="curl"
-    installDependencies $@ builddir="${builddir}"
+    installDependencies $@
     build $@ builddir="${builddir}"
 
     # package $@ library="curl" builddir="${builddir}"
