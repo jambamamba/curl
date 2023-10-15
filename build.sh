@@ -69,6 +69,7 @@ function build() {
             -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
             -DCMAKE_INSTALL_PREFIX=../install-win \
             -DMINGW=1 \
+            -DTARGET=${target} \
             -DCMAKE_TOOLCHAIN_FILE="${srcdir}/curl-options.cmake" \
             -G "Ninja" ..
     elif [ "$target" == "arm" ]; then
@@ -78,6 +79,7 @@ function build() {
             -DCMAKE_MODULE_PATH="${cmake_modules_path}" \
             -DCMAKE_PREFIX_PATH="${cmake_modules_path}" \
             -DCMAKE_TOOLCHAIN_FILE="${srcdir}/curl-options.cmake" \
+            -DTARGET=${target} \
             -G "Ninja" ..
     elif [ "$target" == "x86" ]; then
 		export STRIP="$(which strip)"
@@ -86,6 +88,7 @@ function build() {
             -DCMAKE_MODULE_PATH="${cmake_modules_path}" \
             -DCMAKE_PREFIX_PATH="${cmake_modules_path}" \
             -DCMAKE_TOOLCHAIN_FILE="${srcdir}/curl-options.cmake" \
+            -DTARGET=${target} \
             -G "Ninja" ..
     fi
     ninja --verbose
