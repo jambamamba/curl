@@ -84,33 +84,47 @@ function build() {
     elif [ "$target" == "x86" ]; then
 		export STRIP="$(which strip)"
         cmake \
+            -DCMAKE_BUILD_TYPE=RelWithDebugInfo \
+            -DCMAKE_MODULE_PATH="/usr/local/cmake" \
+            -DCMAKE_PREFIX_PATH="/usr/local/cmake" \
             -DBUILD_SHARED_LIBS=ON \
-            -DCMAKE_MODULE_PATH="${cmake_modules_path}" \
-            -DCMAKE_PREFIX_PATH="${cmake_modules_path}" \
             -DCMAKE_TOOLCHAIN_FILE="${srcdir}/curl-options.cmake" \
             -DTARGET=${target} \
             -G "Ninja" ..
     fi
-    ninja --verbose
+    ninja -v
+    sudo ninja install package
     rsync -uav lib/libcurl* .
     popd
 }
 
 function installDependencies() {
     local target="x86"
-    parseArgs $@
     local depsdir=".deps/${target}"
-    local artifacts_url="/home/$USER/downloads"
-    local libs=(zlib openssl ssh2)
+    local artifacts_url="/downloads"
+    parseArgs $@
+
+    if [[ "${installdeps}" == "false" || "${clean}" == "true" ]]; then
+        return
+    fi
+
+    local libs=(zlib ssh2) #openssl
     for library in "${libs[@]}"; do
         local pin="${library}_pin"
-        # echo "${!pin}" #gets the value of variable where the variable name is "${library}_pin"
+#        echo "${!pin}" #gets the value of variable where the variable name is "${library}_pin"
         local artifacts_file="${library}-${!pin}-${target}.tar.xz"
-        installLib $@ library="${library}" artifacts_file="${artifacts_file}" artifacts_url="${artifacts_url}" depsdir=${depsdir}
+        pushd /tmp
+        tar xf /downloads/${artifacts_file}
+        cd "${library}-${!pin}-${target}"
+        sudo rsync -uav * ${depsdir}/
+        popd
+        rm -fr "/tmp/${library}-${!pin}-${target}"
+        # installLib $@ library="${library}" artifacts_file="${artifacts_file}" artifacts_url="${artifacts_url}" depsdir=${depsdir}
     done
 }
 
 function main() {
+    local target="x86"
     parseArgs $@
 
     local builddir="${target}-build"
@@ -120,18 +134,18 @@ function main() {
     mkdir -p "${builddir}"
 
     skip $@ library="curl"
-    installDependencies $@
+    installDependencies $@ depsdir="/usr/local" 
     build $@ builddir="${builddir}"
 
-    # package $@ library="curl" builddir="${builddir}"
-    local library="curl"
-    local builddir="/tmp/${library}/${target}-build"
-    copyBuildFilesToInstalls $@ builddir="${builddir}"
-        local installsdir="${builddir}/installs"
-        mv ${installsdir}/include/include ${installsdir}/real_include
-        rm -fr ${installsdir}/include
-        mv ${installsdir}/real_include ${installsdir}/include 
-    compressInstalls $@ builddir="${builddir}" library="${library}"
+    # # package $@ library="curl" builddir="${builddir}"
+    # local library="curl"
+    # local builddir="/tmp/${library}/${target}-build"
+    # copyBuildFilesToInstalls $@ builddir="${builddir}"
+    #     local installsdir="${builddir}/installs"
+    #     mv ${installsdir}/include/include ${installsdir}/real_include
+    #     rm -fr ${installsdir}/include
+    #     mv ${installsdir}/real_include ${installsdir}/include 
+    # compressInstalls $@ builddir="${builddir}" library="${library}"
 
 }
 
