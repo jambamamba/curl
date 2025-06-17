@@ -93,7 +93,7 @@ function build() {
             -G "Ninja" ..
     fi
     ninja -v
-    sudo ninja install package
+    sudo ninja install #package
     rsync -uav lib/libcurl* .
     popd
 }
@@ -138,6 +138,7 @@ function main() {
     skip $@ library="curl"
     installDependencies $@ depsdir="/usr/local" 
     build $@ builddir="${builddir}"
+    package target="$target" dst="/downloads"
 
     # # package $@ library="curl" builddir="${builddir}"
     # local library="curl"
