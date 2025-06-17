@@ -108,17 +108,19 @@ function installDependencies() {
         return
     fi
 
-    local libs=(zlib ssh2) #openssl
+    local libs=(zlib libssh2) #openssl
     for library in "${libs[@]}"; do
         local pin="${library}_pin"
 #        echo "${!pin}" #gets the value of variable where the variable name is "${library}_pin"
         local artifacts_file="${library}-${!pin}-${target}.tar.xz"
-        pushd /tmp
+        mkdir -p /tmp/${library}
+        rm -fr /tmp/${library}/*
+        pushd /tmp/${library}
         tar xf /downloads/${artifacts_file}
-        cd "${library}-${!pin}-${target}"
+        # cd "${library}-${!pin}-${target}"
         sudo rsync -uav * ${depsdir}/
         popd
-        rm -fr "/tmp/${library}-${!pin}-${target}"
+        rm -fr "/tmp/${library}"
         # installLib $@ library="${library}" artifacts_file="${artifacts_file}" artifacts_url="${artifacts_url}" depsdir=${depsdir}
     done
 }
