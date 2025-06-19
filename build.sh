@@ -85,9 +85,10 @@ function build() {
 		export STRIP="$(which strip)"
         cmake \
             -DCMAKE_BUILD_TYPE=RelWithDebugInfo \
+            -DCMAKE_INSTALL_PREFIX=/usr/local \
+            -DBUILD_SHARED_LIBS=ON \
             -DCMAKE_MODULE_PATH="/usr/local/cmake" \
             -DCMAKE_PREFIX_PATH="/usr/local/cmake" \
-            -DBUILD_SHARED_LIBS=ON \
             -DCMAKE_TOOLCHAIN_FILE="${srcdir}/curl-options.cmake" \
             -DTARGET=${target} \
             -G "Ninja" ..
