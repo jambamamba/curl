@@ -92,7 +92,7 @@ function build() {
             -DTARGET=${target} \
             -G "Ninja" ..
     fi
-    ninja -v
+    ninja
     sudo ninja install #package
     rsync -uav lib/libcurl* .
     popd
