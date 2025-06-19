@@ -1650,3 +1650,9 @@ if(NOT TARGET curl_uninstall)
       COMMAND ${CMAKE_COMMAND} -P
       ${CMAKE_CURRENT_BINARY_DIR}/CMake/cmake_uninstall.cmake)
 endif()
+
+##################################
+#CMAKE INSTALL
+set(project "libcurl")
+configure_file("${CMAKE_SOURCE_DIR}/share/cmake/scripts/my_install.cmake.in" "${CMAKE_BINARY_DIR}/install.cmake" @ONLY)
+include("${CMAKE_BINARY_DIR}/install.cmake")
