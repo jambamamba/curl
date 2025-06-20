@@ -94,36 +94,9 @@ function build() {
             -G "Ninja" ..
     fi
     ninja
-    sudo ninja install #package
+    sudo ninja install && sudo chown $(id -u):$(id -g) install_manifest.txt
     rsync -uav lib/libcurl* .
     popd
-}
-
-function installDependencies() {
-    local target="x86"
-    local depsdir=".deps/${target}"
-    local artifacts_url="/downloads"
-    parseArgs $@
-
-    if [[ "${installdeps}" == "false" || "${clean}" == "true" ]]; then
-        return
-    fi
-
-    local libs=(zlib libssh2) #openssl
-    for library in "${libs[@]}"; do
-        local pin="${library}_pin"
-#        echo "${!pin}" #gets the value of variable where the variable name is "${library}_pin"
-        local artifacts_file="${library}-${!pin}-${target}.tar.xz"
-        mkdir -p /tmp/${library}
-        rm -fr /tmp/${library}/*
-        pushd /tmp/${library}
-        tar xf /downloads/${artifacts_file}
-        # cd "${library}-${!pin}-${target}"
-        sudo rsync -uav * ${depsdir}/
-        popd
-        rm -fr "/tmp/${library}"
-        # installLib $@ library="${library}" artifacts_file="${artifacts_file}" artifacts_url="${artifacts_url}" depsdir=${depsdir}
-    done
 }
 
 function main() {
@@ -137,9 +110,10 @@ function main() {
     mkdir -p "${builddir}"
 
     skip $@ library="curl"
-    installDependencies $@ depsdir="/usr/local" 
+    local deps=(zlib libssh2)
+    installDeps $@ deps depsdir="/usr/local" 
     build $@ builddir="${builddir}"
-    package target="$target" dst="/downloads"
+    package target="$target" library="${library}"
 
     # # package $@ library="curl" builddir="${builddir}"
     # local library="curl"
