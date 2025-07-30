@@ -114,7 +114,7 @@ function main() {
     installDeps $@ deps depsdir="/usr/local" 
     build $@ builddir="${builddir}"
     package target="$target" library="${library}"
-    updatepin library="curl"
+    updatepin library="curl" 
 
     # # package $@ library="curl" builddir="${builddir}"
     # local library="curl"
